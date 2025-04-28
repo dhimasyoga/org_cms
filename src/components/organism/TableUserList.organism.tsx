@@ -13,9 +13,8 @@ import {
     IconButton,
     Typography,
 } from '@mui/material';
-import { UserList } from '@/modules/constants/types/userList.types';
 import { generateSxStyles, theme } from '@/config/themes.config';
-import { UserDetail, departments, roles, rolesChipColor } from '@/modules/constants/types/userDetail.types';
+import { UserDetail, roles, rolesChipColor } from '@/modules/constants/types/userDetail.types';
 import { Visibility, Create, Delete } from '@mui/icons-material';
 
 // #region INTERFACE
@@ -28,7 +27,6 @@ interface Props {
   onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onPreviewClick?(id: number): void;
   onDeleteClick?(id: number, name: string): void;
-  onRemove?(row: UserList): void;
   loading?: boolean;
   refetch?: () => void;
 }
@@ -62,7 +60,6 @@ const TableUserList: React.FC<Props> = ({
   onRowsPerPageChange,
   onPreviewClick,
   onDeleteClick,
-  onRemove,
   refetch,
   loading
 }) => {

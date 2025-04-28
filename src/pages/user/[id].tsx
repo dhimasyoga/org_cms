@@ -10,7 +10,7 @@ import { Stack, Typography } from '@mui/material';
 import MainService from '@/modules/services/user/https';
 
 import {
-    UserDetail,
+    UserDetail as UserDetailProps,
 } from '@/modules/constants/types/userDetail.types';
 import { departments, roles, statuses } from '@/modules/constants/types/userDetail.types';
 import { generateSxStyles } from '@/config/themes.config';
@@ -36,7 +36,7 @@ const UserDetail: NextPage = () => {
   const { id } = router.query;
 
   const [loading, setLoading] = useState(true)
-  const [userData, setUserData] = useState<UserDetail>({
+  const [userData, setUserData] = useState<UserDetailProps>({
     firstName: '',
     lastName: '',
     username: '',
@@ -124,8 +124,8 @@ const UserDetail: NextPage = () => {
   }
 
   const handleSubmit = async (
-    value: UserDetail,
-    actions: FormikHelpers<UserDetail>
+    value: UserDetailProps,
+    actions: FormikHelpers<UserDetailProps>
   ) => {
     actions.setSubmitting(true)
     const formattedPayload = formatPayload(value)
