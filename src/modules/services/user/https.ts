@@ -3,13 +3,13 @@ import {
     UserFilterParams
 } from '@/modules/constants/types/userList.types';
 
-const baseUrl = 'https://dummyjson.com'
+const baseUrl = process.env.NEXT_PUBLIC_API_USER
 
 async function GetUser(params: UserFilterParams) {
     let endpoint = `${baseUrl}/users`
     const { limit, skip, ...rest } = params
     
-    const isParamsEmpty = Object.values(rest).every(x => x === '');
+    const isParamsEmpty = Object.values(rest).every(x => x === '' || x === null);
     if (!isParamsEmpty) {
         if (params['username']) {
             endpoint += `/search?q=${params['username']}`

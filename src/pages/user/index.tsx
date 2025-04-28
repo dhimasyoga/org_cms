@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react';
+import { NextPage } from "next";
 import { MainLayout } from '@/components/template';
 import { PersonAdd } from '@mui/icons-material';
 import { useRouter } from 'next/router';
-import { NextPage } from "next";
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '@/models/store';
+import { setCurrentPage, setGlobalParams } from '@/models/store/slices/userTableSlice';
+
 import { Alert } from 'ddc-ui-typescript';
+import { getSession } from 'next-auth/react';
 import { AlertProps } from 'ddc-ui-typescript/dist/components/Alert/Alert';
+import {
+  TableUser,
+  CustomDialog
+} from '@/components/organism';
+import { FormikHelpers } from 'formik';
 
 import { FilterListUser } from '@/components/molecules';
 import {
@@ -15,11 +25,18 @@ import {
 } from '@/modules/constants/types/userDetail.types';
 import MainService from '@/modules/services/user/https';
 
-import {
-  TableUser,
-  CustomDialog
-} from '@/components/organism';
-import { FormikHelpers } from 'formik';
+export const getServerSideProps = async (context: any) => {
+  const { req } = context;
+  const session = await getSession({ req });
+  const userToken = session?.accessToken;
+  
+  try {
+    if (!userToken) return { redirect: { destination: '/auth', permanent: false } };
+    return { props: { session } };
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 interface CustomAlertProps extends AlertProps {
   open?: boolean
@@ -27,25 +44,22 @@ interface CustomAlertProps extends AlertProps {
 }
 
 const UserList: NextPage = () => {
+  const dispatch = useAppDispatch()
   const router = useRouter()
   const urlParams = router.query;
+
+  const savedPage = useSelector((state: RootState) => state.userTable.currentPage)
+  const savedParams = useSelector((state: RootState) => state.userTable.params)
 
   const [user, setUser] = useState<any>({})
   const [alert, setAlert] = useState<CustomAlertProps>({})
   const [tableLoading, setTableLoading] = useState(true)
   const [userList, setUserList] = useState<UserDetail[]>([])
 
-  const [page, setPage] = useState<number>(0);
+  const [params, setParams] = useState<UserFilterParams>(savedParams)
+  const [page, setPage] = useState<number>(savedPage);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [count, setCount] = useState<number>(0)
-  const [params, setParams] = useState<UserFilterParams>({
-    username: '',
-    phone: '',
-    department: '',
-    role: '',
-    skip: 0,
-    limit: 10,
-  })
 
   const [dialogConfirmOpen, setDialogConfirmOpen] = useState(false)
   const [dialogConfirmContent, setDialogConfirmContent] = useState('')
@@ -67,6 +81,7 @@ const UserList: NextPage = () => {
 
   const onPageChange = async (newPage: number) => {
     setPage(newPage);
+    dispatch(setCurrentPage(newPage))
 
     let updatedParam = JSON.parse(JSON.stringify(params))
     updatedParam['skip'] = newPage * rowsPerPage
@@ -79,6 +94,7 @@ const UserList: NextPage = () => {
     const limit = e?.target?.value ?? 5
 
     setPage(0);
+    dispatch(setCurrentPage(0))
     setRowsPerPage(limit);
 
     let updatedParam = JSON.parse(JSON.stringify(params))
@@ -86,6 +102,8 @@ const UserList: NextPage = () => {
     updatedParam['limit'] = limit
 
     setParams(updatedParam);
+    dispatch(setGlobalParams(updatedParam))
+
     getUser(updatedParam)
   };
 
@@ -136,7 +154,11 @@ const UserList: NextPage = () => {
   }
 
   useEffect(() => {
-    getUser()
+    const copiedParams = JSON.parse(JSON.stringify(params))
+    copiedParams['skip'] = savedPage * rowsPerPage
+
+    setParams(copiedParams)
+    getUser(copiedParams)
 
     Object.keys(urlParams).length > 0 && (displayCrudResponseAlert())
   }, [])
@@ -148,12 +170,16 @@ const UserList: NextPage = () => {
     let filterParam = JSON.parse(JSON.stringify(params))
     filterParam['username'] = value?.username ?? ''
     filterParam['phone'] = value?.phone ?? ''
-    filterParam['department'] = value?.department?.label ?? ''
-    filterParam['role'] = value?.role?.value ?? ''
+    filterParam['department'] = value?.department?.label ?? null
+    filterParam['role'] = value?.role?.value ?? null
     filterParam['skip'] = 0
 
     setPage(0);
+    dispatch(setCurrentPage(0))
+
     setParams(filterParam)
+    dispatch(setGlobalParams(filterParam))
+
     getUser(filterParam)
 
     actions.setSubmitting(false)
@@ -163,16 +189,22 @@ const UserList: NextPage = () => {
     values: UserFilterParams,
     actions: FormikHelpers<UserFilterParams>
   ) => {
-    setParams({
+    const resettedParams = {
       username: '',
       phone: '',
-      department: '',
-      role: '',
+      department: null,
+      role: null,
       skip: 0,
       limit: 10,
-    })
+    }
 
-    getUser()
+    setParams(resettedParams)
+    dispatch(setGlobalParams(resettedParams))
+
+    setPage(0)
+    dispatch(setCurrentPage(0))
+
+    getUser(resettedParams)
 
     actions.setSubmitting(false)
   }
@@ -216,7 +248,11 @@ const UserList: NextPage = () => {
           }}
         />
       )}
-      <FilterListUser onSubmit={handleSubmit} onReset={handleReset} />
+      <FilterListUser
+        params={params}
+        onSubmit={handleSubmit}
+        onReset={handleReset}
+      />
 
       {/* <TableUser rows={dummyUsers} /> */}
       <TableUser

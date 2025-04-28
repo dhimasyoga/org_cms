@@ -1,10 +1,10 @@
-import { Card } from 'ddc-ui-typescript';
+import { useState } from 'react';
+import { Card, FormControl } from 'ddc-ui-typescript';
 import { Field, Formik, FormikHelpers } from 'formik';
 import { Stack } from '@mui/material';
-import { FormControl } from 'ddc-ui-typescript';
 import { RefreshRounded } from '@mui/icons-material';
 import { Autocomplete, IconButton } from '../atoms';
-import { generateSxStyles, theme } from '@/config/themes.config';
+import { generateSxStyles } from '@/config/themes.config';
 import {
   UserFilterParams,
 } from '@/modules/constants/types/userList.types';
@@ -15,6 +15,7 @@ import {
 
 // #region INTERFACE
 interface Props {
+  params: UserFilterParams,
   onSubmit?(
     values: UserFilterParams,
     actions: FormikHelpers<UserFilterParams>
@@ -26,13 +27,18 @@ interface Props {
 }
 // #endregion
 
-const FilterListUser: React.FC<Props> = ({ onSubmit, onReset }) => {
-  const initialValues: UserFilterParams = {
-    username: '',
-    phone: '',
-    department: null,
-    role: null
-  };
+const FilterListUser: React.FC<Props> = ({
+  params,
+  onSubmit,
+  onReset,
+}) => {
+  const [isReinitialize, setIsReinitialize] = useState<boolean>(false)
+  const initialValues: UserFilterParams = params ?? {
+        username: '',
+        phone: '',
+        department: null,
+        role: null
+      };
 
   const handleSubmit = (
     values: UserFilterParams,
@@ -45,7 +51,12 @@ const FilterListUser: React.FC<Props> = ({ onSubmit, onReset }) => {
     values: UserFilterParams,
     actions: FormikHelpers<UserFilterParams>
   ) => {
+    setIsReinitialize(true)
     onReset && onReset(values, actions);
+
+    setTimeout(() => {
+      setIsReinitialize(false)
+    }, 300)
   };
 
   return (
@@ -54,6 +65,7 @@ const FilterListUser: React.FC<Props> = ({ onSubmit, onReset }) => {
         initialValues={initialValues}
         onSubmit={handleSubmit}
         onReset={handleReset}
+        enableReinitialize={isReinitialize}
       >
         {({
           handleSubmit,
