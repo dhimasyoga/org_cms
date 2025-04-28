@@ -21,7 +21,7 @@ const styles = {
   '.highlight': {
     color: theme.palette.primary.main
   },
-  span: {
+  b: {
     fontWeight: 600,
   }
 }
@@ -34,7 +34,7 @@ const Dashboard: NextPage = () => {
           Welcome to <span className="highlight">ORG CMS</span> Dashboard!
         </Typography>
         <Typography>
-          Head over to <span>User List</span> on the sidebar to view, edit, and manage your users with ease
+          Head over to <b>User List</b> on the sidebar to view, edit, and manage your users with ease
         </Typography>
       </Box>
     </MainLayout>
