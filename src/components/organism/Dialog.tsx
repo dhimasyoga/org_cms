@@ -46,7 +46,7 @@ const UserDetail: React.FC<Props> = ({
 				{loading ? (
 					<Box sx={{ minWidth: '500px' }}>
 						<Typography variant='body2'>
-							Loading user's data. . .
+							Loading user&apos;s data. . .
 						</Typography>
 					</Box>
 				) : (
