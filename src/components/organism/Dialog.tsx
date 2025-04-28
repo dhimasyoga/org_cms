@@ -10,10 +10,13 @@ import {
   Typography
 } from '@mui/material';
 import { generateSxStyles, theme } from '@/config/themes.config';
-import { UserDetail, roles } from "@/modules/constants/types/userDetail.types"
+import {
+	UserDetail as UserDetailProps,
+	roles
+} from "@/modules/constants/types/userDetail.types"
 
 interface Props {
-	data?: UserDetail | null;
+	data?: UserDetailProps | null;
 	message?: string;
 	open?: boolean;
 	loading?: boolean;
