@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+
 import { Button, Wrapper } from "ddc-ui-typescript";
 import { Breadcrumbs } from "../molecules";
 import { theme } from '@/config/themes.config';
@@ -35,6 +38,7 @@ const MainLayout: React.FC<LayoutProps> = ({
   addActionText,
   additionalAction,
 }: LayoutProps) => {
+  const { data: session } = useSession();
   const router = useRouter();
   const [isClient, setIsClient] = useState<boolean>(false);
   useEffect(() => setIsClient(true), []);
@@ -52,20 +56,14 @@ const MainLayout: React.FC<LayoutProps> = ({
       drawerWidth={300}
       navigationList={navigationList}
       profile={{
-        name: 'Administrator'
+        name: session?.user?.username ?? '-'
       }}
       settings={[
         {
-          label: 'Profile',
-          onClick: function noRefCheck() {}
-        },
-        {
-          label: 'Account',
-          onClick: function noRefCheck() {}
-        },
-        {
           label: 'Logout',
-          onClick: function noRefCheck() {}
+          onClick: () => {
+            signOut()
+          }
         }
       ]}
     >

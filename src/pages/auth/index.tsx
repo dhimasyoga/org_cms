@@ -1,36 +1,66 @@
-import { Login, Button } from "ddc-ui-typescript";
-import WindowIcon from '@mui/icons-material/Window';
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
+
+import { Login } from "ddc-ui-typescript";
+import { FormikHelpers } from 'formik';
+
 import { LogoDSF } from "@/components/atoms/Logo/Icon.atom";
 import { generateSxStyles, theme } from '@/config/themes.config';
-
-const AzureLoginButton = (
-    <Button
-        text="Login with microsoft azure"
-        endIcon={<WindowIcon />}
-        variant="outlined"
-        size="large"
-    />
-)
+import { PATH } from "@/modules/constants/string";
 
 export default function Auth() {
-    return (
-        <Login
-            logo={<LogoDSF />}
-            FormProps={{
-                title: 'Admin Content Management System',
-                description: 'Please enter your credentials to manage content.',
-                textUsername: 'Username',
-                textPassword: 'Password',
-                textLogin: 'Login',
-                textRequiredUsername: 'Input Username',
-                textRequiredPassword: 'Input Password',
-                additionalActions: AzureLoginButton,
-                sx: styles.loginForm
-                // errorMessage: 'Invalid Username or Password!',
-            }}
-            variant="centered"
-        />
-    )
+  const ROOT_APP_CODE = process.env.NEXT_PUBLIC_APP_CODE
+  const router = useRouter();
+
+  const [invalidMsg, setInvalidMsg] = useState('')
+
+  const handleLogin = async (
+    data: any,
+    actions: FormikHelpers<any>
+  ) => {
+    try {
+      const response = await signIn('credentials', {
+        redirect: false,
+        username: data.username,
+        password: data.password,
+        app_code: ROOT_APP_CODE,
+        ip_source: "1"
+      })
+
+      if (response?.status == 200) {
+        setInvalidMsg('')
+        router.push(PATH.HOMEPAGE)
+      } else {
+        setInvalidMsg(response?.error || 'An unexpected error occurred')
+      }
+      actions.setSubmitting(false)
+    } catch (error) {
+      console.error('error_sign_in -> ', error)
+
+      actions.setSubmitting(false)
+      setInvalidMsg('An unexpected error occurred. Please try again later.')
+    }
+  };
+
+  return (
+    <Login
+      logo={<LogoDSF />}
+      FormProps={{
+        title: 'Admin Content Management System',
+        description: 'Please enter your credentials to manage content.',
+        textUsername: 'Username',
+        textPassword: 'Password',
+        textLogin: 'Login',
+        textRequiredUsername: 'Input Username',
+        textRequiredPassword: 'Input Password',
+        errorMessage: invalidMsg,
+        sx: styles.loginForm,
+        onLoginClick: handleLogin,
+      }}
+      variant="centered"
+    />
+  )
 }
 
 const styles = generateSxStyles({
@@ -41,8 +71,8 @@ const styles = generateSxStyles({
         '.MuiButton-outlined.MuiButton-outlinedPrimary': {
             marginTop: '1rem !important',
         },
-        '.MuiBox-root.css-0:nth-child(2)': {
-            '+ .MuiStack-root': {
+        '.MuiCardContent-root': {
+            '.MuiStack-root:nth-last-child(2)': {
                 display: 'none',
             }
         },

@@ -1,5 +1,6 @@
 export const PATH = {
   HOMEPAGE: '/dashboard',
+  AUTH_PAGE: '/auth',
   USER_MANAGEMENT: '/user',
   USER_MANAGEMENT_CREATE: '/user/create',
   USER_MANAGEMENT_EDIT: '/user/[id]',

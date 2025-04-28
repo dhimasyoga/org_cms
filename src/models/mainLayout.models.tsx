@@ -22,7 +22,7 @@ export const navigationList: NavigationGroup[] = [
       {
         icon: <Group />,
         href: PATH.USER_MANAGEMENT,
-        label: 'Agreement List',
+        label: 'User List',
         isActive: [
             PATH.USER_MANAGEMENT,
             PATH.USER_MANAGEMENT_CREATE,
