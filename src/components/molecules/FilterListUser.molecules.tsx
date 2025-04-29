@@ -97,9 +97,12 @@ const FilterListUser: React.FC<Props> = ({
                   label="Department"
                   size="small"
                   options={departments}
-                  getOptionLabel={(option: any) =>
-                    option?.label
-                  }
+                  getOptionLabel={(option: any) => {
+                    const label = option?.label ?? departments.find(
+                      (key) => key.label == option
+                    )?.label
+                    return label
+                  }}
                   isOptionEqualToValue={(
                     option: any,
                     value: any
@@ -114,9 +117,12 @@ const FilterListUser: React.FC<Props> = ({
                   label="Role"
                   size="small"
                   options={roles}
-                  getOptionLabel={(option: any) =>
-                    option?.label
-                  }
+                  getOptionLabel={(option: any) => {
+                    const label = option?.label ?? roles.find(
+                      (key) => key.label == option
+                    )?.label
+                    return label
+                  }}
                   isOptionEqualToValue={(
                     option: any,
                     value: any

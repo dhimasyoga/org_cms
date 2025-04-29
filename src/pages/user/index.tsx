@@ -170,8 +170,8 @@ const UserList: NextPage = () => {
     let filterParam = JSON.parse(JSON.stringify(params))
     filterParam['username'] = value?.username ?? ''
     filterParam['phone'] = value?.phone ?? ''
-    filterParam['department'] = value?.department?.label ?? null
-    filterParam['role'] = value?.role?.value ?? null
+    filterParam['department'] = value?.department?.label ?? (value?.department || null)
+    filterParam['role'] = value?.role?.value ?? (value?.role || null)
     filterParam['skip'] = 0
 
     setPage(0);
